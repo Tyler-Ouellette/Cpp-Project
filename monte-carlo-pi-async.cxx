@@ -56,7 +56,7 @@ stop_when_stopped_controller swsc;
   //     * Finally "return result;"
   // and close off the lambda and async.
 
-  auto future_result = (launch::async,[](auto const& swsc, auto const& bm){
+ auto future_result = async(launch::async,[&swsc,&bm](){
       
       bm.start();
 
