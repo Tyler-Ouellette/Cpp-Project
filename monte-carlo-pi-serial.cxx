@@ -97,13 +97,9 @@ int main()
 			auto x = ud(xre); 
 			auto y = ud(yre);
 			
-			if(x > 0.5 || x < -0.5){
-				return false;}else
-			
-			if(y > 0.5 || y < -0.5){
-			return false;}else{
-			
-			return true;}
+			if(sqrt(pow(x,2) + pow(y,2))<= 1){
+				return true;}else{
+			return false;}
 		});
   //   2) The first argument to the monte_carlo<tally_predicate>()
   //      needs to be the controller, i.e., swsc.
