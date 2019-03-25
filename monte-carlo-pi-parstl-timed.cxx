@@ -38,13 +38,13 @@ int main()
   // a Monte Carlo estimate of pi would be 4 times pi / 4.
   //
 
-  #error "NOTE: ninvocations is NOT the number of threads created later!"
+  //#error "NOTE: ninvocations is NOT the number of threads created later!"
   auto const ninvocations = 8;
   cout << "Running " << ninvocations << " invocations... ";
   cout.flush();
 
   // benchmark the total time to compute everything...
-  #error "TODO: Construct a variable called bm of type benchmark<chrono::high_resolution_clock>"
+  //#error "TODO: Construct a variable called bm of type benchmark<chrono::high_resolution_clock>"
 
 benchmark<chrono::high_resolution_clock> bm;
 bm.start();
@@ -54,9 +54,9 @@ bm.start();
   //       benchmark, or, after the declaration call bm.start() to do the same.
 
   // Use a controller to stop all work after two seconds...
-  #error "TODO: Construct a variable called swsc of type stop_after_duration_controller<chrono::high_resolution_clock>"
+  //#error "TODO: Construct a variable called swsc of type stop_after_duration_controller<chrono::high_resolution_clock>"
   
-stop_after_duration_controller<chrono::high_resolution_clock> swsc;
+stop_after_duration_controller<chrono::high_resolution_clock> swsc(2s);
 
 
   // where you pass 2s to the constructor. (NOTE: "s" is a literal operator
@@ -81,9 +81,18 @@ stop_after_duration_controller<chrono::high_resolution_clock> swsc;
   //   * transform (i.e., map) each size_t index to tally_predicate
   //   * reduce (i.e., accumulate) each tally_predicate to a single
   //     tally_predicate
-  auto total = transform_reduce(pstl::execution::par_unseq, [begin(indices),end(indices),tally_predicate,[](){
+  tally_predicate sum();
+  
+  auto total = transform_reduce(pstl::execution::par_unseq, 
+								begin(indices),end(indices), 
+								tally_predicate(),
+								[](tally_predicate sum, tally_predicate temp){
 
-    auto result = monte_carlo<tally_predicate>(swsc,[]()
+									return sum + temp;
+    
+								},[&swsc](size_t const&){
+	  
+	   auto result = monte_carlo<tally_predicate>(swsc,[]()
 		{
 			
 			thread_local static auto xre = make_randomly_seeded_mt19937_64_engine();
@@ -96,20 +105,19 @@ stop_after_duration_controller<chrono::high_resolution_clock> swsc;
 			if(sqrt(pow(x,2) + pow(y,2))<= 1){
 				return true;}else{
 			return false;}
-		});
-
-    return result;
-    
+		}); 
+		
+		return result;
   });
   //#error "TODO: pass pstl::execution::par_unseq as the first argument."
 
   //#error "TODO: arguments 2 & 3: pass iterator range [begin(indices),end(indices))"
 
-  #error "TODO: argument 4: pass in default constructed tally_predicate"
+  //#error "TODO: argument 4: pass in default constructed tally_predicate"
     // NOTE: This is the identity element of performing the reduction
     //       i.e., the "sum"/"accumulate" operations.
 
-  #error "TODO: argument 5: binary lambda, no captures..."
+  //#error "TODO: argument 5: binary lambda, no captures..."
     // NOTE: This lambda is passed two values during the reduction
     //       process: one is the current "sum" of tally_predicates
     //       and the other is a newly available tally_predicate. This
@@ -117,7 +125,7 @@ stop_after_duration_controller<chrono::high_resolution_clock> swsc;
     //       Use the operator +() function to compute this and return the
     //       result.
 
-  #error "TODO: argument 6: unary lambda, capture-b-reference swsc"
+  //#error "TODO: argument 6: unary lambda, capture-b-reference swsc"
     // NOTE: This lamba "maps" one of the values in the range
     //       [begin(indices),end(indices)) and uses such to invoke the
     //       monte_carlo function in this project.
@@ -127,7 +135,6 @@ stop_after_duration_controller<chrono::high_resolution_clock> swsc;
     //       the monte_carlo function from Part 2 and return the result
     //       from this lambda. (Relative to Part 1's code ensure that
     //       "thread_local" is added to the static variable definitions.)
-  );
 
   bm.stop();
 
